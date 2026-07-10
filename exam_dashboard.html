@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Martin · Exam Dashboard · July 2026</title>
+<meta name="description" content="Personal exam countdown dashboard — BAIRD Level 2 Semester 4, Mzuzu University">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root {
+  --paper: #F1ECDD;
+  --paper-raised: #FAF6EA;
+  --paper-dark: #E4DBC2;
+  --ink: #1C2B33;
+  --ink-soft: #5E6C70;
+  --ink-faint: #8B958F;
+  --line: #CFC4A2;
+  --board: #14181C;
+  --board-tile: #1D2227;
+  --amber: #E9A63C;
+  --amber-deep: #B87A1F;
+  --stamp-red: #B23A2E;
+  --green: #2C6B4F;
+  --green-soft: #DCEBDE;
+  --amber-soft: #F7E4BC;
+  --red-soft: #F3D9D3;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: var(--font-body);
+  background:
+    radial-gradient(circle at 12% 8%, rgba(184,122,31,0.05) 0, transparent 38%),
+    radial-gradient(circle at 88% 92%, rgba(44,107,79,0.04) 0, transparent 38%),
+    var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+.app-wrapper { max-width: 900px; margin: 0 auto; padding: 0 18px 70px; }
+
+/* ============================================================
+   TICKET HEADER
+   ============================================================ */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 22px 4px 16px; border-bottom: 2px dashed var(--line);
+  margin-bottom: 26px; gap: 10px; flex-wrap: wrap;
+}
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.logo-mark {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: var(--board);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: var(--amber);
+}
+.logo-text { font-family: var(--font-display); font-weight: 600; font-size: 16px; color: var(--ink); line-height: 1.25; }
+.logo-text small { display: block; font-size: 11px; color: var(--ink-soft); font-weight: 400; font-family: var(--font-mono); letter-spacing: 0.02em; }
+.btn-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: var(--paper-raised); border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: var(--transition);
+  color: var(--ink-soft); font-size: 17px;
+}
+.btn-icon:hover { border-color: var(--amber-deep); color: var(--amber-deep); transform: translateY(-1px); }
+.btn-icon:active { transform: translateY(0); }
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero { padding: 6px 0 8px; text-align: center; }
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: 11.5px; font-weight: 500; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--amber-deep);
+  background: var(--amber-soft); border: 1px solid var(--amber);
+  padding: 5px 13px; border-radius: 100px; margin-bottom: 16px;
+}
+.hero-title {
+  font-family: var(--font-display); font-size: clamp(1.9rem, 5.5vw, 3.1rem);
+  font-weight: 700; line-height: 1.08; letter-spacing: -0.01em;
+  color: var(--ink); margin-bottom: 8px;
+}
+.hero-title em { font-style: italic; color: var(--amber-deep); }
+.hero-subtitle { font-size: 14.5px; color: var(--ink-soft); margin-bottom: 4px; font-family: var(--font-mono); }
+.hero-motivational {
+  font-size: 15px; color: var(--ink); margin: 8px 0 28px;
+  min-height: 22px; font-weight: 500;
+}
+
+.clock-row { display: flex; justify-content: center; margin-bottom: 26px; }
+.clock-pill {
+  background: var(--paper-raised); border: 1px solid var(--line);
+  border-radius: 100px; padding: 9px 20px;
+  font-family: var(--font-mono); font-size: 13px; color: var(--ink-soft);
+  display: flex; align-items: center; gap: 9px;
+}
+.clock-pill .live-time { font-size: 16px; font-weight: 600; color: var(--ink); letter-spacing: 0.03em; }
+.clock-pill .dot-sep { color: var(--amber-deep); }
+
+/* ============================================================
+   SPLIT-FLAP BOARD
+   ============================================================ */
+.board-frame {
+  background: var(--board); border-radius: var(--radius-lg);
+  padding: 22px 18px 16px; max-width: 620px; margin: 0 auto 10px;
+  box-shadow: 0 10px 0 -6px rgba(0,0,0,0.15);
+}
+.board-caption {
+  text-align: center; font-family: var(--font-mono); font-size: 10.5px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--amber);
+  opacity: 0.75; margin-bottom: 14px;
+}
+.flap-row { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.flap-group { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.flap-tile {
+  width: 62px; height: 74px; background: var(--board-tile);
+  border-radius: 6px; position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.flap-tile::after {
+  content: ''; position: absolute; left: 0; right: 0; top: 50%;
+  height: 1px; background: rgba(0,0,0,0.55); transform: translateY(-0.5px);
+}
+.flap-tile span {
+  font-family: var(--font-mono); font-weight: 700; font-size: 34px;
+  color: var(--amber); line-height: 1;
+}
+.flap-tile.flip span { animation: flapPulse 0.32s ease; }
+@keyframes flapPulse {
+  0% { transform: scaleY(1); filter: brightness(1); }
+  40% { transform: scaleY(0.42); filter: brightness(1.6); }
+  100% { transform: scaleY(1); filter: brightness(1); }
+}
+.flap-label {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.12em; color: rgba(233,166,60,0.6);
+}
+@media (max-width: 480px) {
+  .flap-tile { width: 50px; height: 60px; }
+  .flap-tile span { font-size: 26px; }
+}
+
+/* ============================================================
+   SECTION HEADER
+   ============================================================ */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin: 42px 4px 16px;
+}
+.section-title {
+  font-family: var(--font-display); font-size: 19px; font-weight: 700;
+  color: var(--ink);
+}
+.section-badge {
+  font-family: var(--font-mono); font-size: 11.5px; font-weight: 500; padding: 4px 11px;
+  border-radius: 100px; background: var(--paper-raised);
+  border: 1px solid var(--line); color: var(--ink-soft);
+}
+
+/* ============================================================
+   STAT STUBS
+   ============================================================ */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  gap: 10px; margin-bottom: 10px;
+}
+.stat-card {
+  background: var(--paper-raised); border: 1px solid var(--line);
+  border-bottom-style: dashed;
+  border-radius: var(--radius-sm); padding: 14px 15px;
+}
+.stat-icon { font-size: 17px; margin-bottom: 8px; display: block; }
+.stat-value { font-family: var(--font-display); font-size: 24px; font-weight: 700; color: var(--ink); line-height: 1; display: block; }
+.stat-label { font-size: 11px; color: var(--ink-soft); margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+.stat-card.accent-amber .stat-value { color: var(--amber-deep); }
+.stat-card.accent-green .stat-value { color: var(--green); }
+
+/* ============================================================
+   PROGRESS
+   ============================================================ */
+.progress-wrap {
+  background: var(--paper-raised); border: 1px solid var(--line);
+  border-radius: var(--radius-md); padding: 18px 20px; margin-bottom: 10px;
+}
+.progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 11px; }
+.progress-title { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+.progress-pct { font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--amber-deep); }
+.progress-track { height: 8px; background: var(--paper-dark); border-radius: 100px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--amber), var(--amber-deep)); transition: width 1s ease; }
+
+/* ============================================================
+   BOARDING PASS — next exam
+   ============================================================ */
+.boarding-pass {
+  background: var(--paper-raised); border: 1px solid var(--line);
+  border-radius: var(--radius-md); display: flex; overflow: hidden;
+  margin-bottom: 10px; position: relative;
+}
+.bp-main { flex: 1; padding: 20px 22px; }
+.bp-eyebrow { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber-deep); margin-bottom: 7px; }
+.bp-subject { font-family: var(--font-display); font-size: 21px; font-weight: 700; color: var(--ink); margin-bottom: 8px; line-height: 1.25; }
+.bp-meta { font-size: 13px; color: var(--ink-soft); font-family: var(--font-mono); }
+.bp-divider {
+  width: 0; border-left: 2px dashed var(--line); position: relative; margin: 12px 0;
+}
+.bp-divider::before, .bp-divider::after {
+  content: ''; position: absolute; left: -9px; width: 18px; height: 18px;
+  background: var(--paper); border-radius: 50%;
+}
+.bp-divider::before { top: -12px; }
+.bp-divider::after { bottom: -12px; }
+.bp-stub {
+  width: 168px; padding: 20px 16px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center; gap: 5px;
+  background: repeating-linear-gradient(180deg, transparent 0 6px, rgba(0,0,0,0.025) 6px 7px);
+}
+.bp-stub-label { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-faint); }
+.bp-stub-value { font-family: var(--font-mono); font-size: 21px; font-weight: 700; color: var(--amber-deep); letter-spacing: 0.02em; }
+@media (max-width: 500px) {
+  .boarding-pass { flex-direction: column; }
+  .bp-divider { display: none; }
+  .bp-stub { width: auto; border-top: 2px dashed var(--line); }
+}
+
+/* ============================================================
+   DEPARTURES BOARD — exam list
+   ============================================================ */
+.departures-board {
+  background: var(--board); border-radius: var(--radius-lg); padding: 8px 0; overflow: hidden;
+}
+.dep-headrow {
+  display: grid; grid-template-columns: 84px 1fr 96px 96px 120px;
+  padding: 10px 20px; font-family: var(--font-mono); font-size: 10px;
+  text-transform: uppercase; letter-spacing: 0.1em; color: rgba(233,166,60,0.55);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.dep-row {
+  display: grid; grid-template-columns: 84px 1fr 96px 96px 120px;
+  padding: 13px 20px; align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-family: var(--font-mono); font-size: 12.5px; color: #E9E4D3;
+}
+.dep-row:last-child { border-bottom: none; }
+.dep-row.is-next { background: rgba(233,166,60,0.08); }
+.dep-code { color: var(--amber); font-weight: 600; }
+.dep-subject { color: #F1EEE2; font-family: var(--font-body); font-size: 13px; font-weight: 500; padding-right: 8px; }
+.dep-venue { color: #A7ACA1; font-size: 11.5px; }
+.dep-time { color: #C9C3AA; }
+.dep-status { text-align: right; font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; }
+.dep-status.st-upcoming { color: #B7BDAF; }
+.dep-status.st-next { color: var(--amber); font-weight: 700; }
+.dep-status.st-today { color: #7FB4E8; font-weight: 700; }
+.dep-status.st-completed { color: #6FBE8F; }
+@media (max-width: 620px) {
+  .dep-headrow, .dep-row { grid-template-columns: 62px 1fr 78px; }
+  .dep-venue, .dep-time { display: none; }
+}
+
+/* ============================================================
+   WALL CALENDAR
+   ============================================================ */
+.calendar-wrap {
+  background: var(--paper-raised); border: 1px solid var(--line);
+  border-radius: var(--radius-lg); padding: 20px;
+}
+.cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.cal-month { font-family: var(--font-display); font-size: 17px; font-weight: 700; color: var(--ink); }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-day-name { text-align: center; font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-faint); padding: 5px 0; }
+.cal-cell {
+  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 12.5px; font-weight: 500; border-radius: 8px;
+  color: var(--ink-soft); position: relative;
+}
+.cal-cell.other-month { color: var(--ink-faint); opacity: 0.35; }
+.cal-cell.today { background: var(--ink); color: var(--amber); font-weight: 700; }
+.cal-cell.exam-upcoming { background: var(--amber-soft); color: var(--amber-deep); font-weight: 700; border: 1px solid var(--amber); }
+.cal-cell.exam-completed { background: var(--green-soft); color: var(--green); font-weight: 600; }
+.cal-cell.home-day { background: var(--stamp-red); color: #fff; font-weight: 700; }
+.cal-cell.exam-today-cell { background: #DCE9F5; color: #2A5C8C; font-weight: 700; border: 1px solid #7FB4E8; }
+.cal-legend { display: flex; flex-wrap: wrap; gap: 13px; margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--line); }
+.cal-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--ink-soft); }
+.cal-dot { width: 9px; height: 9px; border-radius: 3px; }
+
+/* ============================================================
+   TWO-COL: weather + quote
+   ============================================================ */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+@media (max-width: 620px) { .two-col { grid-template-columns: 1fr; } }
+
+.ticket-card {
+  background: var(--paper-raised); border: 1px solid var(--line);
+  border-radius: var(--radius-md); padding: 18px 19px;
+}
+.weather-top { display: flex; align-items: flex-start; gap: 13px; margin-bottom: 12px; }
+.weather-icon { font-size: 36px; flex-shrink: 0; line-height: 1; }
+.weather-temp { font-family: var(--font-display); font-size: 26px; font-weight: 700; color: var(--ink); line-height: 1; }
+.weather-feels { font-size: 11.5px; color: var(--ink-faint); margin-top: 3px; }
+.weather-desc { font-size: 13px; color: var(--ink-soft); margin-top: 3px; font-weight: 500; }
+.weather-loc { font-size: 10.5px; color: var(--ink-faint); margin-top: 3px; font-family: var(--font-mono); }
+.weather-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.weather-meta-item {
+  display: flex; align-items: center; gap: 5px; font-family: var(--font-mono);
+  font-size: 11px; color: var(--ink-soft); background: var(--paper-dark);
+  padding: 4px 9px; border-radius: 100px;
+}
+.weather-advice {
+  padding: 11px 13px; border-radius: var(--radius-sm);
+  font-size: 12.5px; font-weight: 500; line-height: 1.5;
+  display: flex; align-items: flex-start; gap: 8px;
+}
+.weather-advice.warm { background: var(--red-soft); color: #8C3226; }
+.weather-advice.cool { background: #DDE7F0; color: #2A5C8C; }
+.weather-advice.mild { background: var(--green-soft); color: var(--green); }
+.weather-advice.loading { background: var(--paper-dark); color: var(--ink-soft); }
+.weather-advice .adv-icon { font-size: 16px; flex-shrink: 0; }
+.weather-updated { font-size: 10.5px; color: var(--ink-faint); text-align: right; margin-top: 8px; font-family: var(--font-mono); }
+
+.quote-card { position: relative; display: flex; flex-direction: column; justify-content: center; min-height: 100%; }
+.quote-mark { font-family: var(--font-display); font-size: 44px; color: var(--amber); opacity: 0.35; line-height: 1; margin-bottom: 4px; }
+.quote-text { font-family: var(--font-display); font-size: 15px; font-style: italic; color: var(--ink); line-height: 1.55; margin-bottom: 10px; }
+.quote-author { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--amber-deep); text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* ============================================================
+   CELEBRATION
+   ============================================================ */
+.celebration-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: linear-gradient(160deg, #14181C, #1C2B33);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 30px; opacity: 0; pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+.celebration-overlay.active { opacity: 1; pointer-events: all; }
+.cel-title {
+  font-family: var(--font-display); font-size: clamp(2rem, 6vw, 4rem);
+  font-weight: 700; color: #FAF6EA; line-height: 1.15; margin-bottom: 18px;
+  animation: pulseText 1.5s ease-in-out infinite;
+}
+@keyframes pulseText { 0%,100%{transform:scale(1);} 50%{transform:scale(1.03);} }
+.cel-sub { font-size: 17px; color: rgba(250,246,234,0.7); margin-bottom: 36px; font-family: var(--font-mono); }
+.cel-btn {
+  background: var(--amber); color: #14181C; border: none; font-family: var(--font-body);
+  font-size: 15px; font-weight: 700; padding: 13px 30px;
+  border-radius: 100px; cursor: pointer; transition: var(--transition);
+}
+.cel-btn:hover { transform: translateY(-2px); background: #F0B357; }
+.cel-mute {
+  margin-top: 14px; background: transparent; border: 1px solid rgba(250,246,234,0.25);
+  color: rgba(250,246,234,0.6); padding: 8px 18px; border-radius: 100px;
+  cursor: pointer; font-size: 12.5px; transition: var(--transition);
+}
+.cel-mute:hover { border-color: rgba(250,246,234,0.5); color: #FAF6EA; }
+#celebration-canvas { position: fixed; inset: 0; z-index: 9998; pointer-events: none; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer { text-align: center; padding: 26px 0 4px; font-family: var(--font-mono); font-size: 11px; color: var(--ink-faint); border-top: 1px dashed var(--line); margin-top: 46px; }
+.footer p + p { margin-top: 4px; }
+
+/* ============================================================
+   RIPPLE
+   ============================================================ */
+.ripple-container { position: relative; overflow: hidden; }
+.ripple { position: absolute; border-radius: 50%; background: rgba(233,166,60,0.18); transform: scale(0); animation: rippleAnim 0.6s linear; pointer-events: none; }
+@keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+.toast-stack { position: fixed; bottom: 22px; right: 22px; left: 22px; z-index: 500; display: flex; flex-direction: column; align-items: flex-end; gap: 9px; }
+.toast {
+  background: var(--paper-raised); border: 1px solid var(--line);
+  border-radius: var(--radius-sm); padding: 13px 16px; max-width: 320px;
+  box-shadow: 0 8px 24px rgba(28,43,51,0.14);
+  animation: slideIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  display: flex; align-items: flex-start; gap: 11px;
+}
+@keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.toast-icon { font-size: 18px; flex-shrink: 0; }
+.toast-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+.toast-msg { font-size: 11.5px; color: var(--ink-soft); }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--line); border-radius: 100px; }
+:focus-visible { outline: 2px solid var(--amber-deep); outline-offset: 3px; }
+</style>
+</head>
+<body>
+
+<canvas id="celebration-canvas" aria-hidden="true"></canvas>
+<div class="celebration-overlay" id="celebrationOverlay" role="dialog" aria-label="Celebration — Going Home!">
+  <div class="cel-title">I'M GOING HOME TODAY 🏠</div>
+  <div class="cel-sub">Semester 4 conquered. Lilongwe awaits. You did it!</div>
+  <button class="cel-btn" onclick="document.getElementById('celebrationOverlay').classList.remove('active')">Continue to dashboard</button>
+  <button class="cel-mute" id="muteBtn" onclick="toggleMute()">🔇 Mute</button>
+</div>
+
+<div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+<div class="app-wrapper">
+
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="logo-mark" aria-hidden="true">✈</div>
+      <div class="logo-text">
+        Martin · BAIRD
+        <small>Level 2 · Semester 4 · Mzuzu University</small>
+      </div>
+    </div>
+    <button class="btn-icon" aria-label="Enable notifications" title="Enable notifications" onclick="requestNotifications()">🔔</button>
+  </header>
+
+  <section class="hero" aria-label="Countdown to going home">
+    <div class="hero-eyebrow">📚 Exam season · July 2026</div>
+    <h1 class="hero-title">Now boarding for <em>home</em></h1>
+    <p class="hero-subtitle">28 July 2026 · Lilongwe</p>
+    <p class="hero-motivational" id="motivationalMsg" aria-live="polite"></p>
+
+    <div class="clock-row">
+      <div class="clock-pill" role="timer" aria-label="Current time">
+        <span>🕐</span>
+        <span class="live-time" id="liveTime">00:00:00</span>
+        <span class="dot-sep">·</span>
+        <span id="liveDate"></span>
+      </div>
+    </div>
+
+    <div class="board-frame">
+      <div class="board-caption">Departure countdown</div>
+      <div class="flap-row" role="timer" aria-label="Countdown to going home">
+        <div class="flap-group">
+          <div class="flap-tile" id="tileDays"><span id="cdDays">--</span></div>
+          <span class="flap-label">Days</span>
+        </div>
+        <div class="flap-group">
+          <div class="flap-tile" id="tileHours"><span id="cdHours">--</span></div>
+          <span class="flap-label">Hrs</span>
+        </div>
+        <div class="flap-group">
+          <div class="flap-tile" id="tileMins"><span id="cdMins">--</span></div>
+          <span class="flap-label">Min</span>
+        </div>
+        <div class="flap-group">
+          <div class="flap-tile" id="tileSecs"><span id="cdSecs">--</span></div>
+          <span class="flap-label">Sec</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-header">
+    <h2 class="section-title">Overview</h2>
+  </div>
+  <div class="stats-grid" role="region" aria-label="Exam statistics">
+    <div class="stat-card accent-green">
+      <span class="stat-icon">✅</span>
+      <span class="stat-value" id="statCompleted">0</span>
+      <span class="stat-label">Completed</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">📚</span>
+      <span class="stat-value" id="statRemaining">0</span>
+      <span class="stat-label">Remaining</span>
+    </div>
+    <div class="stat-card accent-amber">
+      <span class="stat-icon">🎯</span>
+      <span class="stat-value" id="statNextExam">—</span>
+      <span class="stat-label">Next exam</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">⏳</span>
+      <span class="stat-value" id="statDaysNext">—</span>
+      <span class="stat-label">Days to next</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">🏠</span>
+      <span class="stat-value" id="statDaysHome">—</span>
+      <span class="stat-label">Days to home</span>
+    </div>
+    <div class="stat-card accent-amber">
+      <span class="stat-icon">📈</span>
+      <span class="stat-value" id="statPct">0%</span>
+      <span class="stat-label">Progress</span>
+    </div>
+  </div>
+
+  <div class="progress-wrap" role="progressbar" aria-label="Overall exam completion">
+    <div class="progress-header">
+      <span class="progress-title">Overall exam completion</span>
+      <span class="progress-pct" id="progressPct">0%</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+
+  <div class="boarding-pass" id="nextExamPanel" role="region" aria-label="Next exam boarding pass">
+    <div class="bp-main">
+      <div class="bp-eyebrow">⚡ Next departure</div>
+      <div class="bp-subject" id="nepSubject">Loading…</div>
+      <div class="bp-meta" id="nepMeta"></div>
+    </div>
+    <div class="bp-divider"></div>
+    <div class="bp-stub">
+      <span class="bp-stub-label">Time to gate</span>
+      <span class="bp-stub-value" id="nepCountdown" aria-live="polite">—</span>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <h2 class="section-title">Departures board</h2>
+    <span class="section-badge" id="examBadge">5 exams</span>
+  </div>
+  <div class="departures-board" role="list" aria-label="Exam departures">
+    <div class="dep-headrow" aria-hidden="true">
+      <span>Code</span><span>Subject</span><span>Venue</span><span>Time</span><span style="text-align:right">Status</span>
+    </div>
+    <div id="examsGrid"></div>
+  </div>
+
+  <div class="section-header">
+    <h2 class="section-title">July 2026</h2>
+  </div>
+  <div class="calendar-wrap" role="region" aria-label="July 2026 calendar">
+    <div class="cal-header"><span class="cal-month">July 2026</span></div>
+    <div class="cal-grid" id="calGrid" role="grid" aria-label="Calendar grid"></div>
+    <div class="cal-legend">
+      <div class="cal-legend-item"><div class="cal-dot" style="background:var(--ink)"></div>Today</div>
+      <div class="cal-legend-item"><div class="cal-dot" style="background:var(--amber-soft);border:1px solid var(--amber)"></div>Upcoming exam</div>
+      <div class="cal-legend-item"><div class="cal-dot" style="background:var(--green-soft)"></div>Completed</div>
+      <div class="cal-legend-item"><div class="cal-dot" style="background:var(--stamp-red)"></div>Going home</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="ticket-card" role="region" aria-label="Weather in Mzuzu">
+      <div class="weather-top">
+        <div class="weather-icon" id="weatherIcon">⏳</div>
+        <div>
+          <div class="weather-temp" id="weatherTemp">Loading…</div>
+          <div class="weather-feels" id="weatherFeels"></div>
+          <div class="weather-desc" id="weatherDesc">Fetching weather…</div>
+          <div class="weather-loc">📍 Mzuzu, Malawi</div>
+        </div>
+      </div>
+      <div class="weather-meta" id="weatherMeta"></div>
+      <div class="weather-advice loading" id="weatherAdvice">
+        <span class="adv-icon">⏳</span>
+        <span id="weatherAdviceText">Checking today's conditions…</span>
+      </div>
+      <div class="weather-updated" id="weatherUpdated"></div>
+    </div>
+
+    <div class="ticket-card quote-card">
+      <div class="quote-mark" aria-hidden="true">“</div>
+      <p class="quote-text" id="quoteText2"></p>
+      <p class="quote-author" id="quoteAuthor2"></p>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>Built for Martin · BAIRD Level 2 · Mzuzu University · Semester 4 · July 2026</p>
+    <p>🏠 Going home July 28 — keep pushing 💛</p>
+  </footer>
+</div>
+
+<script>
+// ============================================================
+// DATA — Edit this to update exams
+// ============================================================
+const HOME_DATE = new Date('2026-07-28T00:00:00');
+
+const EXAMS = [
+  { code: 'BASS 2402', subject: 'Conflict Prevention and Resolution', date: '2026-07-14', startTime: '14:00', endTime: '17:00', venue: 'Ungweru Hall', credits: 13 },
+  { code: 'BDEV 2402', subject: 'Governance and Development', date: '2026-07-17', startTime: '08:00', endTime: '11:00', venue: 'Ungweru Hall', credits: 10 },
+  { code: 'BPOL 2401', subject: 'Comparative Politics', date: '2026-07-22', startTime: '08:00', endTime: '11:00', venue: 'Ungweru Hall', credits: 13 },
+  { code: 'BIRD 2401', subject: 'Small States Diplomacy', date: '2026-07-24', startTime: '08:00', endTime: '11:00', venue: 'Ungweru Hall', credits: 13 },
+  { code: 'BIRD 2402', subject: 'Public Diplomacy', date: '2026-07-28', startTime: '08:00', endTime: '11:00', venue: 'Ungweru Hall', credits: 9 }
+];
+
+const QUOTES = [
+  { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
+  { text: "It always seems impossible until it's done.", author: "Nelson Mandela" },
+  { text: "Do not go where the path may lead; go instead where there is no path and leave a trail.", author: "Ralph Waldo Emerson" },
+  { text: "Education is the most powerful weapon which you can use to change the world.", author: "Nelson Mandela" },
+  { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" },
+  { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
+  { text: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
+  { text: "Hard work beats talent when talent doesn't work hard.", author: "Tim Notke" },
+  { text: "You are braver than you believe, stronger than you seem, and smarter than you think.", author: "A.A. Milne" },
+  { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+  { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
+  { text: "Perseverance is not a long race; it is many short races one after another.", author: "Walter Elliott" },
+  { text: "The expert in anything was once a beginner.", author: "Helen Hayes" },
+  { text: "Either write something worth reading or do something worth writing.", author: "Benjamin Franklin" }
+];
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function pad(n) { return String(n).padStart(2,'0'); }
+
+function getExamDateTime(exam) {
+  const [h, m] = exam.startTime.split(':').map(Number);
+  const d = new Date(exam.date + 'T00:00:00');
+  d.setHours(h, m, 0, 0);
+  return d;
+}
+function getExamEndDateTime(exam) {
+  const [h, m] = exam.endTime.split(':').map(Number);
+  const d = new Date(exam.date + 'T00:00:00');
+  d.setHours(h, m, 0, 0);
+  return d;
+}
+function getExamStatus(exam) {
+  const now = new Date();
+  const start = getExamDateTime(exam);
+  const end = getExamEndDateTime(exam);
+  if (now >= end) return 'completed';
+  if (now >= start && now < end) return 'today';
+  const today = new Date(); today.setHours(0,0,0,0);
+  const examDay = new Date(exam.date); examDay.setHours(0,0,0,0);
+  if (today.getTime() === examDay.getTime()) return 'today';
+  return 'upcoming';
+}
+function formatDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+}
+function msToHMS(ms) {
+  if (ms <= 0) return '00:00:00';
+  const s = Math.floor(ms/1000);
+  const h = Math.floor(s/3600);
+  const m = Math.floor((s%3600)/60);
+  const sec = s%60;
+  if (h > 0) return `${pad(h)}h ${pad(m)}m ${pad(sec)}s`;
+  return `${pad(m)}m ${pad(sec)}s`;
+}
+function msToDays(ms) { return Math.floor(ms / (1000*60*60*24)); }
+
+// ============================================================
+// CLOCK & COUNTDOWN
+// ============================================================
+function updateClock() {
+  const now = new Date();
+  document.getElementById('liveTime').textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  document.getElementById('liveDate').textContent = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+
+const cdDays = document.getElementById('cdDays');
+const cdHours = document.getElementById('cdHours');
+const cdMins = document.getElementById('cdMins');
+const cdSecs = document.getElementById('cdSecs');
+const tileDays = document.getElementById('tileDays');
+const tileHours = document.getElementById('tileHours');
+const tileMins = document.getElementById('tileMins');
+const tileSecs = document.getElementById('tileSecs');
+
+function animateFlip(el, tileEl, newVal) {
+  if (el.textContent !== String(newVal)) {
+    tileEl.classList.add('flip');
+    setTimeout(() => tileEl.classList.remove('flip'), 320);
+  }
+  el.textContent = newVal;
+}
+
+function updateHomeCountdown() {
+  const now = new Date();
+  const ms = HOME_DATE - now;
+
+  if (ms <= 0) { triggerCelebration(); return; }
+
+  const totalSec = Math.floor(ms/1000);
+  const days = Math.floor(totalSec / 86400);
+  const hours = Math.floor((totalSec % 86400) / 3600);
+  const mins = Math.floor((totalSec % 3600) / 60);
+  const secs = totalSec % 60;
+
+  animateFlip(cdDays, tileDays, pad(days));
+  animateFlip(cdHours, tileHours, pad(hours));
+  animateFlip(cdMins, tileMins, pad(mins));
+  animateFlip(cdSecs, tileSecs, pad(secs));
+
+  const msgEl = document.getElementById('motivationalMsg');
+  let msg;
+  if (days > 20) msg = '📚 Stay focused. Every exam brings you closer to home.';
+  else if (days >= 10) msg = "😄 You're getting closer! Keep pushing.";
+  else if (days >= 3) msg = '🎉 Almost there! Home is just around the corner.';
+  else if (days >= 1) msg = "🏡 Tomorrow you'll be home!";
+  else msg = "❤️ CAN'T WAIT TO GO HOME! ❤️";
+  if (msgEl.textContent !== msg) msgEl.textContent = msg;
+
+  document.getElementById('statDaysHome').textContent = days;
+}
+
+// ============================================================
+// EXAM RENDERING
+// ============================================================
+function getNextExam() {
+  const now = new Date();
+  return EXAMS.find(e => getExamEndDateTime(e) > now) || null;
+}
+
+function renderExamCards() {
+  const now = new Date();
+  const nextExam = getNextExam();
+  const grid = document.getElementById('examsGrid');
+  grid.innerHTML = '';
+
+  let completed = 0, remaining = 0;
+
+  EXAMS.forEach(exam => {
+    const status = getExamStatus(exam);
+    if (status === 'completed') completed++; else remaining++;
+
+    const isNext = nextExam && exam.code === nextExam.code;
+    const start = getExamDateTime(exam);
+    const msToExam = start - now;
+
+    const row = document.createElement('div');
+    row.className = `dep-row ripple-container${isNext ? ' is-next' : ''}`;
+    row.setAttribute('role', 'listitem');
+    row.setAttribute('aria-label', `${exam.subject} — ${status}`);
+
+    let statusHTML;
+    if (status === 'completed') statusHTML = `<span class="dep-status st-completed">✓ Departed</span>`;
+    else if (status === 'today') statusHTML = `<span class="dep-status st-today">Boarding now</span>`;
+    else if (isNext) {
+      const d = msToDays(msToExam);
+      statusHTML = `<span class="dep-status st-next">Next · ${d}d</span>`;
+    } else {
+      const d = msToDays(msToExam);
+      statusHTML = `<span class="dep-status st-upcoming">${d}d</span>`;
+    }
+
+    row.innerHTML = `
+      <span class="dep-code">${exam.code}</span>
+      <span class="dep-subject">${exam.subject}</span>
+      <span class="dep-venue">${exam.venue}</span>
+      <span class="dep-time">${exam.startTime}</span>
+      ${statusHTML}
+    `;
+    row.addEventListener('click', function(e) { addRipple(this, e); });
+    grid.appendChild(row);
+  });
+
+  const total = EXAMS.length;
+  const pct = Math.round((completed/total)*100);
+  document.getElementById('statCompleted').textContent = completed;
+  document.getElementById('statRemaining').textContent = remaining;
+  document.getElementById('statPct').textContent = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('examBadge').textContent = `${total} exams`;
+
+  if (nextExam) {
+    document.getElementById('nepSubject').textContent = nextExam.subject;
+    document.getElementById('nepMeta').textContent = `${formatDate(nextExam.date)} · ${nextExam.startTime}–${nextExam.endTime} · ${nextExam.venue}`;
+    document.getElementById('statNextExam').textContent = nextExam.code.split(' ')[0];
+    const msToNext = getExamDateTime(nextExam) - new Date();
+    document.getElementById('statDaysNext').textContent = msToDays(Math.max(0, msToNext));
+  } else {
+    document.getElementById('nepSubject').textContent = 'All exams completed';
+    document.getElementById('nepMeta').textContent = 'Time to go home!';
+    document.getElementById('statNextExam').textContent = 'Done!';
+    document.getElementById('statDaysNext').textContent = '🎉';
+  }
+}
+
+function updateNextExamCountdown() {
+  const next = getNextExam();
+  if (!next) return;
+  const ms = getExamDateTime(next) - new Date();
+  document.getElementById('nepCountdown').textContent = ms > 0 ? msToHMS(ms) : 'Now!';
+}
+
+// ============================================================
+// CALENDAR
+// ============================================================
+function renderCalendar() {
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  dayNames.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-day-name'; el.textContent = d;
+    el.setAttribute('role', 'columnheader');
+    grid.appendChild(el);
+  });
+
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const firstDay = new Date(2026, 6, 1);
+  const lastDay = new Date(2026, 7, 0);
+  const startPad = firstDay.getDay();
+
+  const examDates = {};
+  EXAMS.forEach(e => {
+    const key = e.date.slice(-2).replace(/^0/,'');
+    examDates[key] = getExamStatus(e);
+  });
+
+  for (let i = 0; i < startPad; i++) {
+    const el = document.createElement('div');
+    el.className = 'cal-cell other-month';
+    const prevDay = new Date(2026, 6, 1 - (startPad - i));
+    el.textContent = prevDay.getDate();
+    el.setAttribute('role', 'gridcell'); el.setAttribute('aria-label', 'Previous month');
+    grid.appendChild(el);
+  }
+
+  for (let day = 1; day <= lastDay.getDate(); day++) {
+    const el = document.createElement('div');
+    el.className = 'cal-cell';
+    el.textContent = day;
+    el.setAttribute('role', 'gridcell');
+
+    const thisDate = new Date(2026, 6, day);
+    const isToday = thisDate.getTime() === today.getTime();
+    const isHome = day === 28;
+    const examStatus = examDates[String(day)];
+
+    if (isToday && examStatus) {
+      el.classList.add('exam-today-cell');
+      el.setAttribute('aria-label', `${day} July — Today, exam day`);
+    } else if (isHome) {
+      el.classList.add('home-day');
+      el.setAttribute('aria-label', `${day} July — Going home!`);
+      el.title = '🏠 Going home!';
+    } else if (isToday) {
+      el.classList.add('today');
+      el.setAttribute('aria-label', `${day} July — Today`);
+    } else if (examStatus === 'completed') {
+      el.classList.add('exam-completed');
+      el.setAttribute('aria-label', `${day} July — Exam completed`);
+    } else if (examStatus === 'upcoming') {
+      el.classList.add('exam-upcoming');
+      el.setAttribute('aria-label', `${day} July — Upcoming exam`);
+    }
+    grid.appendChild(el);
+  }
+}
+
+// ============================================================
+// DAILY QUOTE
+// ============================================================
+function setDailyQuote() {
+  const dayOfYear = Math.floor((Date.now() - new Date(2026,0,1)) / 86400000);
+  const quote = QUOTES[dayOfYear % QUOTES.length];
+  const t = document.getElementById('quoteText2');
+  const a = document.getElementById('quoteAuthor2');
+  if (t) t.textContent = quote.text;
+  if (a) a.textContent = '— ' + quote.author;
+}
+
+// ============================================================
+// RIPPLE
+// ============================================================
+function addRipple(el, e) {
+  const rect = el.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  const x = (e.clientX - rect.left) - size/2;
+  const y = (e.clientY - rect.top) - size/2;
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  ripple.style.cssText = `width:${size}px;height:${size}px;left:${x}px;top:${y}px`;
+  el.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 700);
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(icon, title, msg, duration=5000) {
+  const stack = document.getElementById('toastStack');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.setAttribute('role', 'alert');
+  toast.innerHTML = `<div class="toast-icon">${icon}</div><div><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div>`;
+  stack.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0'; toast.style.transition = 'opacity 0.4s';
+    setTimeout(() => toast.remove(), 400);
+  }, duration);
+}
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+function requestNotifications() {
+  if (!('Notification' in window)) {
+    showToast('❌', 'Not supported', 'Notifications not supported in this browser.');
+    return;
+  }
+  Notification.requestPermission().then(p => {
+    if (p === 'granted') {
+      showToast('🔔', 'Notifications enabled', "You'll be reminded before each exam.");
+      checkAndNotify();
+    } else {
+      showToast('🔇', 'Notifications blocked', 'Enable them in your browser settings.');
+    }
+  });
+}
+function checkAndNotify() {
+  if (Notification.permission !== 'granted') return;
+  const now = new Date();
+  EXAMS.forEach(exam => {
+    const start = getExamDateTime(exam);
+    const msTo = start - now;
+    if (msTo > 0 && msTo < 24*60*60*1000) {
+      new Notification(`Exam tomorrow: ${exam.subject}`, {
+        body: `${formatDate(exam.date)} at ${exam.startTime} — ${exam.venue}`
+      });
+    }
+  });
+}
+
+// ============================================================
+// CELEBRATION
+// ============================================================
+let celebrationActive = false;
+let audioCtx = null;
+let muted = false;
+
+function toggleMute() {
+  muted = !muted;
+  document.getElementById('muteBtn').textContent = muted ? '🔊 Unmute' : '🔇 Mute';
+}
+
+function triggerCelebration() {
+  if (celebrationActive) return;
+  celebrationActive = true;
+
+  document.body.style.animation = 'none';
+  document.body.offsetHeight;
+  document.body.style.animation = 'shake 0.5s ease';
+  setTimeout(() => { document.body.style.animation = ''; }, 500);
+
+  document.getElementById('celebrationOverlay').classList.add('active');
+  startConfetti();
+
+  if (!muted) {
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      playFanfare(audioCtx);
+    } catch(e) {}
+  }
+}
+
+function playFanfare(ctx) {
+  const notes = [523, 659, 784, 1047, 784, 1047];
+  let t = ctx.currentTime;
+  notes.forEach(freq => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = freq;
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0.15, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t+0.25);
+    osc.start(t); osc.stop(t+0.25);
+    t += 0.18;
+  });
+}
+
+function startConfetti() {
+  const canvas = document.getElementById('celebration-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const colors = ['#E9A63C','#B87A1F','#FAF6EA','#6FBE8F','#B23A2E','#F0B357'];
+  const pieces = [];
+  const PIECE_COUNT = 200;
+
+  for (let i = 0; i < PIECE_COUNT; i++) {
+    pieces.push({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height - canvas.height,
+      w: Math.random()*10+4,
+      h: Math.random()*16+6,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      vx: (Math.random()-0.5)*3,
+      vy: Math.random()*4+2,
+      rot: Math.random()*360,
+      rotv: (Math.random()-0.5)*6
+    });
+  }
+
+  let frames = 0;
+  const maxFrames = 1800;
+
+  function drawConfetti() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const opacity = frames > maxFrames*0.7 ? 1-(frames-maxFrames*0.7)/(maxFrames*0.3) : 1;
+
+    pieces.forEach(p => {
+      ctx.save();
+      ctx.globalAlpha = opacity * 0.9;
+      ctx.translate(p.x+p.w/2, p.y+p.h/2);
+      ctx.rotate(p.rot * Math.PI/180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+      p.x += p.vx; p.y += p.vy; p.rot += p.rotv;
+      if (p.y > canvas.height) { p.y = -p.h; p.x = Math.random()*canvas.width; }
+    });
+
+    frames++;
+    if (frames < maxFrames) requestAnimationFrame(drawConfetti);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  drawConfetti();
+}
+
+const shakeStyle = document.createElement('style');
+shakeStyle.textContent = `
+@keyframes shake {
+  0%,100%{transform:translate(0,0);}
+  20%{transform:translate(-8px,4px);}
+  40%{transform:translate(8px,-4px);}
+  60%{transform:translate(-5px,3px);}
+  80%{transform:translate(5px,-2px);}
+}`;
+document.head.appendChild(shakeStyle);
+
+// ============================================================
+// MASTER TICK
+// ============================================================
+let lastRenderMinute = -1;
+
+function tick() {
+  const now = new Date();
+  updateClock();
+  updateHomeCountdown();
+  updateNextExamCountdown();
+
+  if (now.getMinutes() !== lastRenderMinute) {
+    renderExamCards();
+    renderCalendar();
+    lastRenderMinute = now.getMinutes();
+  }
+}
+
+// ============================================================
+// WEATHER — Open-Meteo API (free, no key needed)
+// Mzuzu, Malawi: lat -11.4656, lon 34.0187
+// ============================================================
+const WEATHER_LAT = -11.4656;
+const WEATHER_LON = 34.0187;
+
+const WMO_CODES = {
+  0: { icon: '☀️', label: 'Clear sky' }, 1: { icon: '🌤️', label: 'Mainly clear' },
+  2: { icon: '⛅', label: 'Partly cloudy' }, 3: { icon: '☁️', label: 'Overcast' },
+  45: { icon: '🌫️', label: 'Fog' }, 48: { icon: '🌫️', label: 'Icy fog' },
+  51: { icon: '🌦️', label: 'Light drizzle' }, 53: { icon: '🌦️', label: 'Drizzle' },
+  55: { icon: '🌧️', label: 'Heavy drizzle' }, 61: { icon: '🌧️', label: 'Light rain' },
+  63: { icon: '🌧️', label: 'Rain' }, 65: { icon: '🌧️', label: 'Heavy rain' },
+  71: { icon: '❄️', label: 'Light snow' }, 73: { icon: '❄️', label: 'Snow' },
+  75: { icon: '❄️', label: 'Heavy snow' }, 80: { icon: '🌦️', label: 'Rain showers' },
+  81: { icon: '🌧️', label: 'Heavy showers' }, 82: { icon: '⛈️', label: 'Violent showers' },
+  95: { icon: '⛈️', label: 'Thunderstorm' }, 96: { icon: '⛈️', label: 'Thunderstorm w/ hail' },
+  99: { icon: '⛈️', label: 'Severe thunderstorm' }
+};
+
+function getClothingAdvice(temp, windspeed, weatherCode) {
+  const isRain = [51,53,55,61,63,65,80,81,82,95,96,99].includes(weatherCode);
+  const isThunder = [95,96,99].includes(weatherCode);
+
+  if (temp < 12) {
+    return { type: 'cool', icon: '🧥', text: isRain
+      ? `It's ${temp}°C and raining — wear a warm jacket or hoodie and carry an umbrella. Definitely dress in layers today.`
+      : `It's a cold ${temp}°C in Mzuzu — wear a warm jacket or hoodie. Layer up before heading to the exam hall.` };
+  } else if (temp < 18) {
+    return { type: 'cool', icon: '🧣', text: isRain
+      ? `It's ${temp}°C with rain — a light jacket and an umbrella would serve you well today.`
+      : `It's ${temp}°C — a light jacket or long-sleeved shirt is a good call, especially in the mornings.` };
+  } else if (temp < 24) {
+    return { type: 'mild', icon: '👕', text: isThunder
+      ? `Pleasant ${temp}°C but thunderstorms around — carry something waterproof just in case.`
+      : isRain
+        ? `It's a comfortable ${temp}°C but there's rain — light clothes are fine, but pack a small umbrella.`
+        : `A pleasant ${temp}°C in Mzuzu — light, comfortable clothing is all you need today.` };
+  } else {
+    return { type: 'warm', icon: '🌞', text: `It's warm at ${temp}°C — go light and breathable. Stay hydrated, especially walking to Ungweru Hall.` };
+  }
+}
+
+async function fetchWeather() {
+  const params = new URLSearchParams({
+    latitude: WEATHER_LAT, longitude: WEATHER_LON,
+    current: 'temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code,is_day',
+    daily: 'temperature_2m_max,temperature_2m_min',
+    timezone: 'Africa/Blantyre', forecast_days: 1
+  });
+
+  try {
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
+    if (!res.ok) throw new Error('API error: ' + res.status);
+    const data = await res.json();
+
+    const cur = data.current;
+    const temp = Math.round(cur.temperature_2m);
+    const feelsLike = Math.round(cur.apparent_temperature);
+    const humidity = Math.round(cur.relative_humidity_2m);
+    const wind = Math.round(cur.wind_speed_10m);
+    const code = cur.weather_code;
+    const isDay = cur.is_day;
+    const maxTemp = Math.round(data.daily.temperature_2m_max[0]);
+    const minTemp = Math.round(data.daily.temperature_2m_min[0]);
+
+    const wmo = WMO_CODES[code] || { icon: isDay ? '🌤️' : '🌙', label: 'Variable' };
+    const advice = getClothingAdvice(temp, wind, code);
+
+    document.getElementById('weatherIcon').textContent = wmo.icon;
+    document.getElementById('weatherTemp').textContent = temp + '°C';
+    document.getElementById('weatherFeels').textContent = `Feels like ${feelsLike}°C · High ${maxTemp}° / Low ${minTemp}°`;
+    document.getElementById('weatherDesc').textContent = wmo.label;
+
+    const meta = document.getElementById('weatherMeta');
+    meta.innerHTML = `
+      <div class="weather-meta-item">💧 ${humidity}%</div>
+      <div class="weather-meta-item">💨 ${wind} km/h</div>
+      <div class="weather-meta-item">${isDay ? '☀️ Day' : '🌙 Night'}</div>
+    `;
+
+    const advEl = document.getElementById('weatherAdvice');
+    advEl.className = `weather-advice ${advice.type}`;
+    document.getElementById('weatherAdviceText').textContent = advice.text;
+    advEl.querySelector('.adv-icon').textContent = advice.icon;
+
+    const now = new Date();
+    document.getElementById('weatherUpdated').textContent = `Updated ${pad(now.getHours())}:${pad(now.getMinutes())} · Open-Meteo`;
+
+  } catch (err) {
+    console.error('Weather fetch failed:', err);
+    document.getElementById('weatherIcon').textContent = '⚠️';
+    document.getElementById('weatherTemp').textContent = '—';
+    document.getElementById('weatherDesc').textContent = 'Could not load weather';
+    document.getElementById('weatherAdviceText').textContent = 'Weather unavailable — check your internet connection.';
+  }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  setDailyQuote();
+  fetchWeather();
+  setInterval(fetchWeather, 10 * 60 * 1000);
+  renderExamCards();
+  renderCalendar();
+  tick();
+  setInterval(tick, 1000);
+
+  setTimeout(() => {
+    showToast('🏠', 'Dashboard loaded', 'Counting down to going home — keep going!');
+  }, 800);
+
+  if (new Date() >= HOME_DATE) triggerCelebration();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
